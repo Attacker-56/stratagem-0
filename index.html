@@ -3,448 +3,398 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stratagem-0 | v1.3 Beta</title>
-    <!-- Professional Typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Stratagem | v2.3 Integrity + Modules</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Tactical Palette */
             --bg-main: #060608; 
-            --glass-bg: rgba(20, 20, 23, 0.7);
+            --glass-bg: rgba(20, 20, 23, 0.8);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --chat-bg: rgba(26, 26, 29, 0.5); 
-            --accent: #ff8c00; /* Tactical Orange */
+            --accent: #ff8c00;
             --text-main: #ffffff;
             --text-muted: #a0a0aa; 
             --light-sq: #f0d9b5; 
             --dark-sq: #b84b3e;
+            --danger: #ff3e3e;
         }
 
         * { font-family: 'Inter', sans-serif !important; box-sizing: border-box; outline: none; }
+        body { background: radial-gradient(circle at center, #111 0%, #000 100%); color: var(--text-main); margin: 0; display: flex; justify-content: center; min-height: 100vh; overflow: hidden; }
         
-        body { 
-            background: radial-gradient(circle at center, #111 0%, #000 100%);
-            color: var(--text-main); 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-            min-height: 100vh; 
-            overflow: hidden; 
-        }
-        
-        /* Glassmorphism Implementation */
         .app-container { display: flex; flex-wrap: wrap; justify-content: center; max-width: 1400px; width: 100%; gap: 15px; padding: 15px; }
-        
-        .panel { 
-            background: var(--glass-bg); 
-            backdrop-filter: blur(12px) saturate(160%); 
-            -webkit-backdrop-filter: blur(12px) saturate(160%);
-            border: 1px solid var(--glass-border); 
-            border-radius: 12px; 
-            padding: 18px; 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); 
-        }
-        
-        .sidebar { width: 280px; display: flex; flex-direction: column; gap: 12px; }
+        .panel { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 12px; padding: 18px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); }
+        .sidebar { width: 300px; display: flex; flex-direction: column; gap: 12px; }
         .board-column { flex-grow: 1; min-width: 550px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
-        /* Board Styling */
-        .board-wrapper { 
-            position: relative; 
-            padding: 20px; 
-            background: var(--glass-bg); 
-            backdrop-filter: blur(10px);
-            border-radius: 8px; 
-            border: 1px solid var(--glass-border); 
-        }
-        #board { display: grid; grid-template-columns: repeat(8, 65px); grid-template-rows: repeat(8, 65px); border: 2px solid #222; }
-        .square { width: 65px; height: 65px; display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; transition: background 0.2s; }
+        #board { display: grid; grid-template-columns: repeat(8, 65px); grid-template-rows: repeat(8, 65px); border: 4px solid #222; border-radius: 4px; position: relative; }
+        .square { width: 65px; height: 65px; display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; }
         .light { background-color: var(--light-sq); }
         .dark { background-color: var(--dark-sq); }
-        .piece { width: 58px; height: 58px; z-index: 10; pointer-events: none; }
-        .selected { background-color: rgba(255, 140, 0, 0.45) !important; }
-
-        /* Tactical Orange Buttons */
-        button { 
-            cursor: pointer; 
-            font-weight: 700; 
-            border-radius: 6px; 
-            border: none; 
-            padding: 12px; 
-            width: 100%; 
-            background: var(--accent); 
-            color: #000; 
-            transition: 0.2s; 
-            font-size: 0.75rem; 
-            text-transform: uppercase; 
-            letter-spacing: 1.5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        button:hover { background: #ffa500; transform: translateY(-1px); box-shadow: 0 0 15px rgba(255, 140, 0, 0.3); }
-        .btn-sec { background: var(--glass-border); color: var(--text-main); margin-top: 5px; }
-        .btn-sec:hover { background: rgba(255, 255, 255, 0.2); }
-
-        /* AI Face & Moods */
-        .bot-frame { width: 140px; height: 110px; background: rgba(197, 225, 165, 0.1); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(168, 193, 138, 0.3); }
-        .bot-screen { width: 110px; height: 85px; background: #000; border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .eye { fill: none; stroke: #fff; stroke-width: 8; stroke-linecap: round; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .mouth-path { fill: none; stroke: #ff5252; stroke-width: 3; stroke-linecap: round; transition: 0.5s; }
         
-        .mood-thinking .eye { animation: scan 1.2s infinite alternate ease-in-out; }
-        @keyframes scan { from { transform: translateX(-10px); } to { transform: translateX(10px); } }
+        .piece { width: 58px; height: 58px; z-index: 10; transition: transform 0.2s ease; pointer-events: none; }
+        .selected { background-color: rgba(255, 140, 0, 0.4) !important; }
+        .hint-dot { width: 14px; height: 14px; background: rgba(0,0,0,0.2); border-radius: 50%; pointer-events: none; }
+        .capture-target { box-shadow: inset 0 0 0 4px var(--danger) !important; }
+        
+        .bot-frame { width: 140px; height: 110px; background: rgba(255, 255, 255, 0.05); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border); }
+        .bot-screen { width: 110px; height: 85px; background: #000; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .eye { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; transition: 0.3s; }
+        .thinking .eye { animation: scan 0.5s infinite alternate; stroke: #fff; }
+        @keyframes scan { from { transform: translateX(-5px); } to { transform: translateX(5px); } }
 
-        /* UI Elements */
-        .chat-bubble { background: var(--chat-bg); padding: 15px; border-radius: 8px; font-style: italic; border: 1px solid var(--glass-border); font-size: 0.75rem; text-align: center; margin-top: 10px; min-height: 60px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
-        .memory-box { height: 110px; overflow-y: auto; font-size: 0.65rem; color: var(--text-muted); background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; border: 1px solid var(--accent); margin-top: 5px; }
-        .mem-entry { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 6px 0; display: flex; justify-content: space-between; }
-        .icon-btn { width: 18px; height: 18px; fill: var(--text-muted); cursor: pointer; transition: 0.2s; }
-        .icon-btn:hover { fill: var(--accent); }
+        button { cursor: pointer; font-weight: 800; border-radius: 6px; border: none; padding: 12px; width: 100%; background: var(--accent); color: #000; transition: 0.2s; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-sec { background: var(--glass-border); color: var(--text-main); margin-top: 8px; }
+        #log { height: 160px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--accent); line-height: 1.5; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; }
 
-        /* Settings Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
-        .modal-content { background: var(--glass-bg); padding: 30px; border-radius: 16px; width: 360px; border: 1px solid var(--glass-border); }
-        label { font-size: 0.65rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 5px; letter-spacing: 1px; }
-        input, select { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: #fff; border-radius: 6px; margin-bottom: 18px; font-size: 0.8rem; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .modal-content { background: var(--glass-bg); padding: 30px; border-radius: 15px; width: 340px; border: 1px solid var(--glass-border); }
+        input, select { width: 100%; padding: 10px; background: #000; border: 1px solid var(--glass-border); color: #fff; border-radius: 6px; margin-bottom: 15px; font-size: 0.8rem; }
+        label { font-size: 0.6rem; opacity: 0.6; text-transform: uppercase; margin-bottom: 5px; display: block; }
+
+        /* MODULE CSS */
+        .coord-label { position: absolute; font-size: 11px; font-weight: 800; color: var(--accent); opacity: 0.6; pointer-events: none; }
+        .rank-label { left: -22px; width: 20px; text-align: center; }
+        .file-label { bottom: -22px; width: 65px; text-align: center; }
+        .identity-panel { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 5px; border-left: 3px solid var(--accent); }
+        .name-text { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-main); }
+        .graveyard { display: flex; flex-wrap: wrap; gap: 2px; min-height: 20px; margin-top: 5px; opacity: 0.8; }
+        .dead-piece { width: 18px; height: 18px; }
     </style>
 </head>
 <body>
 
-<div id="settings-modal" class="modal">
+<div id="cfg-modal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0; font-size: 0.9rem; color: var(--accent); letter-spacing: 2px;">CORE CONFIGURATION</h3>
-        
-        <label>DESIGNATION</label>
-        <input type="text" id="name-in">
-        
-        <label>LM STUDIO UPLINK PORT</label>
-        <input type="text" id="port-in" placeholder="1234">
-
-        <label>INTERFACE ACCENT (BOARD)</label>
-        <input type="color" id="color-in">
-        
-        <label>PIECE ARCHETYPE</label>
-        <select id="style-in">
-            <option value="wiki">Classic Archive</option>
-            <option value="cburnett">Wikipedia Standard</option>
-            <option value="merida">Merida Variant</option>
-            <option value="alpha">Alpha Digital</option>
-        </select>
-        
-        <button onclick="saveSettings()">COMMIT TO MEMORY</button>
-        <button class="btn-sec" onclick="toggleModal('settings-modal')">ABORT</button>
+        <h3 style="color: var(--accent); margin-top: 0;">ENGINE SETTINGS</h3>
+        <label>Player Name</label>
+        <input type="text" id="name-in" placeholder="Enter your name">
+        <label>Accent Color</label>
+        <input type="color" id="color-in" value="#ff8c00">
+        <label>Brain Depth</label>
+        <select id="depth-in"><option value="2">2 (Fast)</option><option value="3" selected>3 (Normal)</option><option value="4">4 (Master)</option></select>
+        <label>Data Archive</label>
+        <input type="text" id="data-io" placeholder="Paste data here...">
+        <div style="display:flex; gap:10px;">
+            <button onclick="exportData()" class="btn-sec">Export</button>
+            <button onclick="importData()" class="btn-sec">Import</button>
+        </div>
+        <hr style="border:0; border-top:1px solid var(--glass-border); margin:20px 0;">
+        <button onclick="saveCfg()">SAVE & APPLY</button>
+        <button class="btn-sec" onclick="closeModal()">CLOSE</button>
     </div>
 </div>
 
 <div class="app-container">
     <div class="sidebar">
+        <!-- Identity Module -->
         <div class="panel">
-            <div style="display:flex; justify-content: space-between; margin-bottom: 12px;">
-                <svg class="icon-btn" viewBox="0 0 24 24" onclick="toggleTheme()">
-                    <path d="M12 21A9 9 0 1 1 21 12A9 9 0 0 1 12 21Z" fill="none" stroke="currentColor" stroke-width="2"/>
-                    <path d="M12 21A9 9 0 0 1 12 3V21Z" fill="currentColor"/>
-                </svg>
-                <svg class="icon-btn" viewBox="0 0 24 24" onclick="toggleModal('settings-modal')">
-                    <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.91,7.62,6.29L5.23,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.72,8.87 c-0.11,0.2-0.06,0.47,0.12,0.61l2.03,1.58C4.84,11.36,4.82,11.68,4.82,12c0,0.32,0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.11-0.2,0.06-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 c0-1.98,1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6C15.6,13.98,13.98,15.6,12,15.6z"/>
-                </svg>
+            <div class="identity-panel">
+                <div style="flex-grow:1">
+                    <div class="name-text" id="name-w-display">WHITE: PLAYER</div>
+                    <div class="graveyard" id="grave-w"></div>
+                </div>
+            </div>
+            <div class="identity-panel" style="border-color: #555">
+                <div style="flex-grow:1">
+                    <div class="name-text" id="name-b-display">BLACK: STRATAGEM AI</div>
+                    <div class="graveyard" id="grave-b"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div style="display:flex; justify-content: space-between; margin-bottom:10px; font-size: 0.7rem;">
+                <span onclick="switchSides()" style="cursor:pointer; font-weight: 800;">FLIP</span>
+                <span onclick="openModal()" style="cursor:pointer; font-weight: 800;"> Settings</span>
             </div>
             <div class="bot-frame"><div class="bot-screen" id="ai-face">
                 <svg width="80" height="50" viewBox="0 0 100 60">
-                    <path id="l-eye" class="eye" d="M30 25 L40 25" />
-                    <path id="r-eye" class="eye" d="M60 25 L70 25" />
-                    <path id="mouth" class="mouth-path" d="M40 45 Q50 52 60 45" />
+                    <path class="eye" d="M30 25 L40 25" /><path class="eye" d="M60 25 L70 25" />
+                    <path fill="none" stroke="#555" stroke-width="2" d="M40 45 Q50 50 60 45" />
                 </svg>
             </div></div>
-            <div id="ai-msg" class="chat-bubble">Stratagem-0 Online. Neural link established.</div>
+            <div id="ai-msg" style="font-size: 0.7rem; text-align: center; margin-top: 10px; color: var(--text-muted);">READY</div>
         </div>
-        <div class="panel">
-            <div style="font-weight: 800; color: var(--accent); font-size: 0.6rem; letter-spacing: 1px;">MEMORY INSPECTOR</div>
-            <div id="memory-list" class="memory-box">Scanning...</div>
-        </div>
-        <button onclick="startSelfTrain()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z"/></svg>
-            SELF-CALIBRATE
-        </button>
+        <div class="panel" style="flex-grow:1"><div id="log"></div></div>
+        <button onclick="resetGame()">REBOOT</button>
     </div>
 
     <div class="board-column">
-        <div class="panel" style="width:100%; display:flex; justify-content:space-between; padding:10px 20px; align-items:center;">
-            <div style="font-weight: 800; font-size: 0.75rem; letter-spacing: 2px;">STRATAGEM-0 <span style="opacity:0.4;">1.3.B</span></div>
-            <span id="train-label" style="font-size: 0.6rem; color: var(--accent); font-weight: 800;"></span>
+        <div class="panel" style="width:100%; display:flex; justify-content:space-between; padding:10px 20px;">
+            <div style="font-weight: 800; font-size: 0.75rem;">STRATAGEM-0 beta <span id="ai-status" style="color:var(--accent)">only online v1.0</span></div>
+            <div id="turn-label" style="font-weight: 800; font-size: 0.75rem;">WHITE TO MOVE</div>
         </div>
-        <div class="board-wrapper"><div id="board"></div></div>
-        <div class="panel" style="width:100%; padding:10px 20px; opacity:0.6; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;"><span id="user-display">USER_PROTOCOL</span></div>
-    </div>
-
-    <div class="sidebar">
-        <div class="panel" style="flex-grow:1">
-            <div style="font-weight:800; font-size:0.6rem; color: var(--text-muted); margin-bottom:8px; letter-spacing:1px;">TACTICAL LOG</div>
-            <div id="log" style="height:170px; overflow-y:auto; font-size:0.7rem; color: var(--accent);"></div>
+        <div id="board"></div>
+        <div class="panel" style="width:100%; font-size: 0.65rem; opacity:0.6; text-align: center;">
+            DEPTH: <span id="depth-tag">3</span> | SIDE: <span id="side-tag">WHITE</span>
         </div>
-        <button class="btn-sec" onclick="saveBrainFile()">SAVE PERSISTENCE</button>
-        <button class="btn-sec" onclick="loadBrainFile()">LOAD PERSISTENCE</button>
-        <button onclick="location.reload()" style="background:#111; color:#fff; margin-top:10px; border:1px solid #333;">SYSTEM REBOOT</button>
     </div>
 </div>
 
 <script>
-/* 
-   ==========================================================================
-   ENGINE: STRATAGEM-0 PRO (v1.3)
-   ==========================================================================
-*/
-class StratagemAI {
-    constructor() {
-        this.board = this.init();
-        this.turn = 'w';
-        this.brain = {}; 
-        this.history = [];
-        this.weights = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
-    }
+/** ENGINE CORE **/
+const PIECES = { 
+    wP: 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/wP.svg',
+    wN: 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/wN.svg',
+    wB: 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/wB.svg',
+    wR: 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/wR.svg',
+    wQ: 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/wQ.svg',
+    wK: 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/wK.svg',
+    bP: 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/bP.svg',
+    bN: 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/bN.svg',
+    bB: 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/bB.svg',
+    bR: 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/bR.svg',
+    bQ: 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/bQ.svg',
+    bK: 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/bK.svg'
+};
 
-    init() {
-        const p = (c, t) => ({ color: c, type: t, moved: false });
-        const back = (c) => [p(c,'r'), p(c,'n'), p(c,'b'), p(c,'q'), p(c,'k'), p(c,'b'), p(c,'n'), p(c,'r')];
-        const pawns = (c) => Array(8).fill(null).map(() => p(c,'p'));
-        return [back('b'), pawns('b'), ...Array(4).fill(null).map(() => Array(8).fill(null)), pawns('w'), back('w')];
-    }
+let board = [];
+let turn = 'w';
+let userSide = 'w';
+let selected = null;
+let isThinking = false;
+let config = { color: '#ff8c00', depth: 3, name: 'Player' };
+let captured = { w: [], b: [] };
 
-    getLegalMoves(r, c, board = this.board) {
-        const piece = board[r][c];
-        if (!piece) return [];
-        let moves = [];
-        const vectors = {
-            n: [[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]],
-            b: [[1,1],[1,-1],[-1,1],[-1,-1]], r: [[1,0],[-1,0],[0,1],[0,-1]],
-            q: [[1,1],[1,-1],[-1,1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]],
-            k: [[1,1],[1,-1],[-1,1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]]
-        };
-        if (piece.type === 'p') {
-            const dir = piece.color === 'w' ? -1 : 1;
-            if (board[r+dir] && !board[r+dir][c]) {
-                moves.push([r+dir, c]);
-                if (!piece.moved && board[r+2*dir] && !board[r+2*dir][c]) moves.push([r+2*dir, c]);
+function init() {
+    board = Array(8).fill(null).map(() => Array(8).fill(null));
+    captured = { w: [], b: [] };
+    const layout = ['R','N','B','Q','K','B','N','R'];
+    for(let i=0; i<8; i++) {
+        board[1][i] = { type: 'P', color: 'b' };
+        board[6][i] = { type: 'P', color: 'w' };
+        board[0][i] = { type: layout[i], color: 'b' };
+        board[7][i] = { type: layout[i], color: 'w' };
+    }
+    updateGraveyard();
+    render();
+}
+
+function getMoves(b, r, c, validate = true) {
+    const p = b[r][c];
+    if(!p) return [];
+    let moves = [];
+    const dir = p.color === 'w' ? -1 : 1;
+    if(p.type === 'P') {
+        if(r+dir >= 0 && r+dir < 8 && !b[r+dir][c]) {
+            moves.push({r: r+dir, c: c});
+            if((p.color === 'w' && r === 6 || p.color === 'b' && r === 1) && !b[r+2*dir][c]) moves.push({r: r+2*dir, c: c});
+        }
+        [[-1,1],[1,1]].forEach(d => {
+            let nc = c + d[0], nr = r + dir;
+            if(nr>=0 && nr<8 && nc>=0 && nc<8 && b[nr][nc] && b[nr][nc].color !== p.color) moves.push({r: nr, c: nc});
+        });
+    } else {
+        const steps = {
+            'N': [[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]],
+            'B': [[1,1],[1,-1],[-1,1],[-1,-1]], 'R': [[0,1],[0,-1],[1,0],[-1,0]],
+            'Q': [[1,1],[1,-1],[-1,1],[-1,-1],[0,1],[0,-1],[1,0],[-1,0]],
+            'K': [[1,1],[1,-1],[-1,1],[-1,-1],[0,1],[0,-1],[1,0],[-1,0]]
+        }[p.type];
+        steps.forEach(s => {
+            let nr = r+s[0], nc = c+s[1];
+            while(nr>=0 && nr<8 && nc>=0 && nc<8) {
+                if(b[nr][nc]) { if(b[nr][nc].color !== p.color) moves.push({r: nr, c: nc}); break; }
+                moves.push({r: nr, c: nc});
+                if(p.type === 'N' || p.type === 'K') break;
+                nr += s[0]; nc += s[1];
             }
-            [[dir,1],[dir,-1]].forEach(([dr, dc]) => {
-                const t = board[r+dr]?.[c+dc];
-                if (t && t.color !== piece.color) moves.push([r+dr, c+dc]);
-            });
-        } else {
-            vectors[piece.type].forEach(([dr, dc]) => {
-                let nr = r+dr, nc = c+dc;
-                while (board[nr]?.[nc] !== undefined) {
-                    if (board[nr][nc]) {
-                        if (board[nr][nc].color !== piece.color) moves.push([nr, nc]);
-                        break;
-                    }
-                    moves.push([nr, nc]);
-                    if (['n', 'k'].includes(piece.type)) break;
-                    nr += dr; nc += dc;
-                }
-            });
-        }
-        return moves;
+        });
     }
+    return validate ? moves.filter(m => {
+        let s = JSON.parse(JSON.stringify(b));
+        s[m.r][m.c] = s[r][c]; s[r][c] = null;
+        return !inCheck(s, p.color);
+    }) : moves;
+}
 
-    getHash(b) { return b.map(row => row.map(p => p ? (p.color + p.type) : '_').join('')).join('|'); }
-
-    evaluate(board) {
-        let score = 0;
-        const hash = this.getHash(board);
-        if (this.brain[hash]) score += (this.brain[hash] * 10);
-        for (let r=0; r<8; r++) for (let c=0; c<8; c++) {
-            const p = board[r][c];
-            if (p) score += (p.color === 'w' ? this.weights[p.type] : -this.weights[p.type]);
+function inCheck(b, color) {
+    let kr, kc;
+    for(let r=0; r<8; r++) for(let c=0; c<8; c++) if(b[r][c]?.type === 'K' && b[r][c].color === color) { kr=r; kc=c; }
+    for(let r=0; r<8; r++) for(let c=0; c<8; c++) {
+        if(b[r][c] && b[r][c].color !== color) {
+            if(getMoves(b, r, c, false).some(m => m.r === kr && m.c === kc)) return true;
         }
-        return score;
     }
+    return false;
+}
 
-    getBestMove() {
-        let best = null, bestV = -Infinity;
-        let moves = [];
-        for (let r=0; r<8; r++) for (let c=0; c<8; c++) 
-            if (this.board[r][c]?.color === 'b') 
-                this.getLegalMoves(r, c, this.board).forEach(m => moves.push({fr:r, fc:c, tr:m[0], tc:m[1]}));
+function evaluate(b) {
+    const s = { 'P': 10, 'N': 30, 'B': 30, 'R': 50, 'Q': 90, 'K': 900 };
+    let t = 0;
+    for(let r=0; r<8; r++) for(let c=0; c<8; c++) if(b[r][c]) t += s[b[r][c].type] * (b[r][c].color === 'w' ? 1 : -1);
+    return t;
+}
 
-        for (const m of moves) {
-            const nb = this.board.map(row => [...row]);
-            nb[m.tr][m.tc] = nb[m.fr][m.fc]; nb[m.fr][m.fc] = null;
-            const v = -this.evaluate(nb); 
-            if (v > bestV) { bestV = v; best = m; }
+function minimax(b, depth, alpha, beta, isMax) {
+    if(depth === 0) return evaluate(b);
+    let moves = [];
+    const col = isMax ? 'w' : 'b';
+    for(let r=0; r<8; r++) for(let c=0; c<8; c++) if(b[r][c]?.color === col) getMoves(b, r, c, true).forEach(m => moves.push({fr:r, fc:c, tr:m.r, tc:m.c}));
+    if(moves.length === 0) return isMax ? -10000 : 10000;
+    if(isMax) {
+        let best = -Infinity;
+        for(let m of moves) {
+            let n = JSON.parse(JSON.stringify(b)); n[m.tr][m.tc] = n[m.fr][m.fc]; n[m.fr][m.fc] = null;
+            best = Math.max(best, minimax(n, depth-1, alpha, beta, false));
+            alpha = Math.max(alpha, best); if(beta <= alpha) break;
+        }
+        return best;
+    } else {
+        let best = Infinity;
+        for(let m of moves) {
+            let n = JSON.parse(JSON.stringify(b)); n[m.tr][m.tc] = n[m.fr][m.fc]; n[m.fr][m.fc] = null;
+            best = Math.min(best, minimax(n, depth-1, alpha, beta, true));
+            beta = Math.min(beta, best); if(beta <= alpha) break;
         }
         return best;
     }
 }
 
-/* 
-   ==========================================================================
-   UI & APP CONTROL
-   ==========================================================================
-*/
-const engine = new StratagemAI();
-const boardEl = document.getElementById('board');
-let selected = null;
-let stats = JSON.parse(localStorage.getItem('stratagem_v13_stats')) || { name: 'OPERATOR_01', port: '1234', color: '#b84b3e', style: 'cburnett', theme: 'dark' };
-
+/** UI AND MOVES **/
 function render() {
-    if (!boardEl.children.length) {
-        for (let r=0; r<8; r++) for (let c=0; c<8; c++) {
-            const s = document.createElement('div');
-            s.className = `square ${(r+c)%2===0?'light':'dark'}`;
-            s.id = `sq-${r}-${c}`;
-            s.onclick = () => handle(r, c);
-            boardEl.appendChild(s);
+    const boardEl = document.getElementById('board');
+    boardEl.innerHTML = '';
+    const flipped = userSide === 'b';
+    const activeMoves = selected ? getMoves(board, selected.r, selected.c, true) : [];
+
+    for(let i=0; i<64; i++) {
+        let r = flipped ? 7 - Math.floor(i/8) : Math.floor(i/8);
+        let c = flipped ? 7 - (i%8) : i%8;
+        let sq = document.createElement('div');
+        sq.className = `square ${(r+c)%2 === 0 ? 'light' : 'dark'}`;
+        sq.onclick = () => onSquareClick(r, c);
+
+        let p = board[r][c];
+        let move = activeMoves.find(m => m.r === r && m.c === c);
+
+        if(p) {
+            let img = document.createElement('img');
+            img.className = 'piece'; img.src = PIECES[p.color + p.type];
+            sq.appendChild(img);
+            if(move) sq.classList.add('capture-target');
+        } else if(move) {
+            let dot = document.createElement('div'); dot.className = 'hint-dot';
+            sq.appendChild(dot);
         }
+        if(selected && selected.r === r && selected.c === c) sq.classList.add('selected');
+        boardEl.appendChild(sq);
     }
-    for (let r=0; r<8; r++) for (let c=0; c<8; c++) {
-        const s = document.getElementById(`sq-${r}-${c}`);
-        const p = engine.board[r][c];
-        s.classList.toggle('selected', selected?.[0]===r && selected?.[1]===c);
-        const img = s.querySelector('img');
-        if (p) {
-            const url = getPiecePath(p.color, p.type);
-            if (!img || img.src !== url) s.innerHTML = `<img src="${url}" class="piece">`;
-        } else if (img) s.innerHTML = '';
-    }
-    updateBrainUI();
-    document.getElementById('log').innerHTML = engine.history.map((m, i) => `<div>[STEP_${(i+1).toString().padStart(2,'0')}] ${m}</div>`).join('');
+    drawCoords(flipped);
+    document.getElementById('turn-label').innerText = (turn === 'w' ? "WHITE" : "BLACK") + " TO MOVE";
 }
 
-function getPiecePath(color, type) {
-    if (stats.style === 'wiki') {
-        const wMap = {'wp':'4/45/Chess_plt45','wr':'7/72/Chess_rlt45','wn':'7/70/Chess_nlt45','wb':'b/b1/Chess_blt45','wq':'1/15/Chess_qlt45','wk':'4/42/Chess_klt45','bp':'c/c7/Chess_pdt45','br':'f/ff/Chess_rdt45','bn':'e/ef/Chess_ndt45','bb':'9/98/Chess_bdt45','bq':'4/47/Chess_qdt45','bk':'f/f0/Chess_kdt45'};
-        return `https://upload.wikimedia.org/wikipedia/commons/${wMap[color+type]}.svg`;
+function executeMove(fr, fc, tr, tc) {
+    if(board[tr][tc]) {
+        let victim = board[tr][tc].color + board[tr][tc].type;
+        captured[board[tr][tc].color === 'w' ? 'b' : 'w'].push(victim);
+        updateGraveyard();
     }
-    return `https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/${stats.style}/${color}${type.toUpperCase()}.svg`;
+    board[tr][tc] = board[fr][fc];
+    if(board[tr][tc].type === 'P' && (tr === 0 || tr === 7)) board[tr][tc].type = 'Q';
+    board[fr][fc] = null;
+    turn = turn === 'w' ? 'b' : 'w';
 }
 
-function handle(r, c) {
-    if (engine.turn === 'b') return;
-    const p = engine.board[r][c];
-    if (p?.color === 'w') { selected = [r, c]; render(); }
-    else if (selected) {
-        const moves = engine.getLegalMoves(selected[0], selected[1]);
-        if (moves.some(m => m[0]===r && m[1]===c)) {
-            const piece = engine.board[selected[0]][selected[1]];
-            engine.board[r][c] = piece; engine.board[selected[0]][selected[1]] = null;
-            piece.moved = true;
-            engine.history.push(`${piece.type.toUpperCase()}${String.fromCharCode(97+c)}${8-r}`);
-            engine.turn = 'b'; selected = null; render();
-            processAI();
+function onSquareClick(r, c) {
+    if(isThinking || turn !== userSide) return;
+    const p = board[r][c];
+    if(p && p.color === userSide) { selected = {r, c}; }
+    else if(selected) {
+        const move = getMoves(board, selected.r, selected.c, true).find(m => m.r === r && m.c === c);
+        if(move) {
+            executeMove(selected.r, selected.c, r, c);
+            log(`USER: ${String.fromCharCode(97+c)}${8-r}`);
+            selected = null; render();
+            setTimeout(aiCycle, 500);
+            return;
         }
+        selected = null;
     }
+    render();
 }
 
-async function processAI() {
-    const moods = ['thinking', 'skeptical', 'surprised', 'happy'];
-    setMood(moods[Math.floor(Math.random()*moods.length)]);
-    
-    try {
-        const res = await fetch(`http://localhost:${stats.port}/v1/chat/completions`, {
-            method: "POST", headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ messages: [{role: "system", content: "Tactical response to: " + engine.history.slice(-1)}], max_tokens: 30 })
-        });
-        const d = await res.json();
-        document.getElementById('ai-msg').innerText = d.choices[0].message.content;
-    } catch(e) { document.getElementById('ai-msg').innerText = "Analyzing move... Calculating optimal counter-strategy."; }
+function aiCycle() {
+    if(turn === userSide || isThinking) return;
+    isThinking = true;
+    document.getElementById('ai-face').classList.add('thinking');
+    document.getElementById('ai-status').innerText = "THINKING...";
 
     setTimeout(() => {
-        const m = engine.getBestMove();
-        if (m) {
-            const p = engine.board[m.fr][m.fc];
-            engine.board[m.tr][m.tc] = p; engine.board[m.fr][m.fc] = null;
-            p.moved = true;
-            engine.history.push(`${p.type.toUpperCase()}${String.fromCharCode(97+m.tc)}${8-m.tr}`);
-            engine.brain[engine.getHash(engine.board)] = (engine.brain[engine.getHash(engine.board)] || 0) + 1;
-            engine.turn = 'w'; setMood('idle'); render();
+        let moves = [];
+        for(let r=0; r<8; r++) for(let c=0; c<8; c++) if(board[r][c]?.color === turn) getMoves(board, r, c, true).forEach(m => moves.push({fr:r, fc:c, tr:m.r, tc:m.c}));
+        if(moves.length === 0) { isThinking = false; return; }
+
+        let bestMove = null, bestVal = turn === 'w' ? -Infinity : Infinity;
+        for(let m of moves) {
+            let n = JSON.parse(JSON.stringify(board)); n[m.tr][m.tc] = n[m.fr][m.fc]; n[m.fr][m.fc] = null;
+            let v = minimax(n, config.depth - 1, -Infinity, Infinity, turn === 'b');
+            if(turn === 'w' ? v > bestVal : v < bestVal) { bestVal = v; bestMove = m; }
         }
-    }, 800);
-}
 
-function setMood(m) {
-    const s = document.getElementById('ai-face'); s.className = 'bot-screen mood-' + m;
-    const l = document.getElementById('l-eye'), r = document.getElementById('r-eye'), mouth = document.getElementById('mouth');
-    
-    // Reset
-    l.setAttribute('d', "M30 25 L40 25"); r.setAttribute('d', "M60 25 L70 25");
-    mouth.setAttribute('d', "M40 45 Q50 52 60 45");
-
-    if (m==='skeptical') { 
-        l.setAttribute('d',"M30 27 L40 25"); r.setAttribute('d',"M60 25 L70 27"); 
-        mouth.setAttribute('d', "M40 48 L60 48");
-    }
-    else if (m==='happy') { 
-        l.setAttribute('d',"M30 25 Q35 20 40 25"); r.setAttribute('d',"M60 25 Q65 20 70 25"); 
-        mouth.setAttribute('d', "M35 45 Q50 58 65 45");
-    }
-    else if (m==='surprised') { 
-        l.setAttribute('d',"M32 23 A 4 4 0 1 1 38 23"); r.setAttribute('d',"M62 23 A 4 4 0 1 1 68 23"); 
-        mouth.setAttribute('d', "M45 50 A 5 5 0 1 1 55 50");
-    }
-}
-
-function updateBrainUI() {
-    const list = document.getElementById('memory-list');
-    const sorted = Object.keys(engine.brain).sort((a,b) => engine.brain[b] - engine.brain[a]).slice(0, 8);
-    list.innerHTML = sorted.map(k => `<div class="mem-entry"><span>DATA_${k.substring(0,6)}</span><b>+${engine.brain[k]}</b></div>`).join('');
-}
-
-async function startSelfTrain() {
-    document.getElementById('train-label').innerText = "CALIBRATING...";
-    setMood('thinking');
-    for (let i = 0; i < 30; i++) {
-        let sim = new StratagemAI(); sim.brain = engine.brain;
-        let mvCount = 0;
-        while (mvCount < 25) {
-            const m = sim.getBestMove(); if(!m) break;
-            sim.board[m.tr][m.tc] = sim.board[m.fr][m.fc]; sim.board[m.fr][m.fc] = null;
-            engine.brain[sim.getHash(sim.board)] = (engine.brain[sim.getHash(sim.board)] || 0) + 1;
-            mvCount++;
+        if(bestMove) {
+            executeMove(bestMove.fr, bestMove.fc, bestMove.tr, bestMove.tc);
+            log(`AI: ${String.fromCharCode(97+bestMove.tc)}${8-bestMove.tr}`);
         }
-        if (i % 5 === 0) await new Promise(r => setTimeout(r, 5));
+        isThinking = false;
+        document.getElementById('ai-face').classList.remove('thinking');
+        document.getElementById('ai-status').innerText = "ONLINE";
+        render();
+    }, 250);
+}
+
+/** MODULES **/
+function drawCoords(flipped) {
+    const b = document.getElementById('board');
+    for(let i=0; i<8; i++) {
+        let rL = document.createElement('div'); rL.className = 'coord-label rank-label';
+        rL.style.top = `${i*65+25}px`; rL.innerText = flipped ? (i+1) : (8-i);
+        let fL = document.createElement('div'); fL.className = 'coord-label file-label';
+        fL.style.left = `${i*65}px`; fL.innerText = String.fromCharCode(65+(flipped ? 7-i : i));
+        b.appendChild(rL); b.appendChild(fL);
     }
-    document.getElementById('train-label').innerText = "DONE";
-    setMood('happy'); setTimeout(()=>setMood('idle'), 2000); render();
 }
 
-async function saveBrainFile() {
-    const blob = new Blob([JSON.stringify(engine.brain)], {type: 'application/json'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = 'Stratagem_V13_Soul.json'; a.click();
+function updateGraveyard() {
+    document.getElementById('grave-w').innerHTML = captured.w.map(p => `<img src="${PIECES[p]}" class="dead-piece">`).join('');
+    document.getElementById('grave-b').innerHTML = captured.b.map(p => `<img src="${PIECES[p]}" class="dead-piece">`).join('');
 }
 
-function loadBrainFile() {
-    const input = document.createElement('input'); input.type = 'file';
-    input.onchange = e => {
-        const reader = new FileReader();
-        reader.onload = ev => { engine.brain = JSON.parse(ev.target.result); render(); };
-        reader.readAsText(e.target.files[0]);
-    };
-    input.click();
+function log(msg) {
+    const l = document.getElementById('log');
+    l.innerHTML = `<div>> ${msg}</div>` + l.innerHTML;
 }
 
-function toggleModal(id) { const m = document.getElementById(id); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; }
-function toggleTheme() { stats.theme = stats.theme === 'dark' ? 'light' : 'dark'; localStorage.setItem('stratagem_v13_stats', JSON.stringify(stats)); location.reload(); }
+function openModal() { document.getElementById('cfg-modal').style.display = 'flex'; }
+function closeModal() { document.getElementById('cfg-modal').style.display = 'none'; }
 
-function saveSettings() {
-    stats.name = document.getElementById('name-in').value || stats.name;
-    stats.port = document.getElementById('port-in').value || stats.port;
-    stats.color = document.getElementById('color-in').value;
-    stats.style = document.getElementById('style-in').value;
-    localStorage.setItem('stratagem_v13_stats', JSON.stringify(stats));
-    location.reload();
+function saveCfg() {
+    config.name = document.getElementById('name-in').value || "Player";
+    config.color = document.getElementById('color-in').value;
+    config.depth = parseInt(document.getElementById('depth-in').value);
+    document.documentElement.style.setProperty('--accent', config.color);
+    document.getElementById('name-w-display').innerText = userSide === 'w' ? `WHITE: ${config.name}` : `WHITE: STRATAGEM AI`;
+    document.getElementById('name-b-display').innerText = userSide === 'b' ? `BLACK: ${config.name}` : `BLACK: STRATAGEM AI`;
+    document.getElementById('depth-tag').innerText = config.depth;
+    closeModal();
 }
 
-// Initial Sync
-document.getElementById('name-in').value = stats.name;
-document.getElementById('port-in').value = stats.port;
-document.getElementById('color-in').value = stats.color;
-document.getElementById('style-in').value = stats.style;
-document.getElementById('user-display').innerText = stats.name;
-document.documentElement.style.setProperty('--dark-sq', stats.color);
-render();
+function switchSides() {
+    userSide = userSide === 'w' ? 'b' : 'w';
+    document.getElementById('side-tag').innerText = userSide === 'w' ? 'WHITE' : 'BLACK';
+    resetGame();
+    saveCfg();
+}
+
+function resetGame() { turn = 'w'; init(); log("REBOOTED"); if(userSide === 'b') setTimeout(aiCycle, 600); }
+function exportData() { document.getElementById('data-io').value = btoa(JSON.stringify({b:board, t:turn, s:userSide, c:config, g:captured})); }
+function importData() { 
+    let d = JSON.parse(atob(document.getElementById('data-io').value)); 
+    board=d.b; turn=d.t; userSide=d.s; config=d.c; captured=d.g; 
+    render(); updateGraveyard(); closeModal(); 
+}
+
+init();
 </script>
 </body>
 </html>
