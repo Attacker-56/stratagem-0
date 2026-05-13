@@ -3,124 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stratagem-0 | v1.0 Beta</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Stratagem-0 | v1.3 Beta</title>
+    <!-- Professional Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #0a0a0c; --panel-bg: #141417; --panel-border: #232328;
-            --chat-bg: #1a1a1d; --accent: #ff416c; --text-main: #ffffff;
-            --text-muted: #888899; --light-sq: #f0d9b5; --dark-sq: #b84b3e;
+            /* Tactical Palette */
+            --bg-main: #060608; 
+            --glass-bg: rgba(20, 20, 23, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --chat-bg: rgba(26, 26, 29, 0.5); 
+            --accent: #ff8c00; /* Tactical Orange */
+            --text-main: #ffffff;
+            --text-muted: #a0a0aa; 
+            --light-sq: #f0d9b5; 
+            --dark-sq: #b84b3e;
         }
-        * { font-family: 'Outfit', sans-serif !important; box-sizing: border-box; }
-        body { background: var(--bg-main); color: var(--text-main); margin: 0; display: flex; justify-content: center; min-height: 100vh; overflow: hidden; }
+
+        * { font-family: 'Inter', sans-serif !important; box-sizing: border-box; outline: none; }
         
+        body { 
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
+            color: var(--text-main); 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            min-height: 100vh; 
+            overflow: hidden; 
+        }
+        
+        /* Glassmorphism Implementation */
         .app-container { display: flex; flex-wrap: wrap; justify-content: center; max-width: 1400px; width: 100%; gap: 15px; padding: 15px; }
-        .panel { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .sidebar { width: 260px; display: flex; flex-direction: column; gap: 12px; }
+        
+        .panel { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(12px) saturate(160%); 
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+            border: 1px solid var(--glass-border); 
+            border-radius: 12px; 
+            padding: 18px; 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); 
+        }
+        
+        .sidebar { width: 280px; display: flex; flex-direction: column; gap: 12px; }
         .board-column { flex-grow: 1; min-width: 550px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
-        /* Board */
-        .board-wrapper { position: relative; padding: 20px; background: var(--panel-bg); border-radius: 12px; border: 1px solid var(--panel-border); }
-        #board { display: grid; grid-template-columns: repeat(8, 65px); grid-template-rows: repeat(8, 65px); border: 3px solid #222; }
-        .square { width: 65px; height: 65px; display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; }
+        /* Board Styling */
+        .board-wrapper { 
+            position: relative; 
+            padding: 20px; 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(10px);
+            border-radius: 8px; 
+            border: 1px solid var(--glass-border); 
+        }
+        #board { display: grid; grid-template-columns: repeat(8, 65px); grid-template-rows: repeat(8, 65px); border: 2px solid #222; }
+        .square { width: 65px; height: 65px; display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; transition: background 0.2s; }
         .light { background-color: var(--light-sq); }
         .dark { background-color: var(--dark-sq); }
         .piece { width: 58px; height: 58px; z-index: 10; pointer-events: none; }
-        .selected { background-color: rgba(255, 215, 0, 0.4) !important; }
+        .selected { background-color: rgba(255, 140, 0, 0.45) !important; }
 
-        /* Memory Viewer */
-        .memory-box { height: 100px; overflow-y: auto; font-size: 0.7rem; color: var(--text-muted); background: #000; padding: 10px; border-radius: 8px; border: 1px solid var(--accent); }
-        .mem-entry { border-bottom: 1px solid #222; padding: 4px 0; display: flex; justify-content: space-between; }
+        /* Tactical Orange Buttons */
+        button { 
+            cursor: pointer; 
+            font-weight: 700; 
+            border-radius: 6px; 
+            border: none; 
+            padding: 12px; 
+            width: 100%; 
+            background: var(--accent); 
+            color: #000; 
+            transition: 0.2s; 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        button:hover { background: #ffa500; transform: translateY(-1px); box-shadow: 0 0 15px rgba(255, 140, 0, 0.3); }
+        .btn-sec { background: var(--glass-border); color: var(--text-main); margin-top: 5px; }
+        .btn-sec:hover { background: rgba(255, 255, 255, 0.2); }
 
-        /* AI Persona */
-        .bot-frame { width: 140px; height: 100px; background: #c5e1a5; border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center; border: 4px solid #a8c18a; }
-        .bot-screen { width: 110px; height: 75px; background: #000; border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .eye { fill: none; stroke: #fff; stroke-width: 8; stroke-linecap: round; transition: 0.3s; }
-        .chat-bubble { background: var(--chat-bg); padding: 12px; border-radius: 10px; font-style: italic; border: 1px solid var(--panel-border); font-size: 0.75rem; text-align: center; margin-top: 10px; min-height: 50px; }
+        /* AI Face & Moods */
+        .bot-frame { width: 140px; height: 110px; background: rgba(197, 225, 165, 0.1); border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(168, 193, 138, 0.3); }
+        .bot-screen { width: 110px; height: 85px; background: #000; border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .eye { fill: none; stroke: #fff; stroke-width: 8; stroke-linecap: round; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .mouth-path { fill: none; stroke: #ff5252; stroke-width: 3; stroke-linecap: round; transition: 0.5s; }
         
-        button { cursor: pointer; font-weight: 800; border-radius: 8px; border: none; padding: 10px; width: 100%; background: var(--accent); color: white; transition: 0.2s; font-size: 0.8rem; }
-        .btn-sec { background: var(--panel-border); color: var(--text-main); margin-top: 5px; }
+        .mood-thinking .eye { animation: scan 1.2s infinite alternate ease-in-out; }
+        @keyframes scan { from { transform: translateX(-10px); } to { transform: translateX(10px); } }
+
+        /* UI Elements */
+        .chat-bubble { background: var(--chat-bg); padding: 15px; border-radius: 8px; font-style: italic; border: 1px solid var(--glass-border); font-size: 0.75rem; text-align: center; margin-top: 10px; min-height: 60px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+        .memory-box { height: 110px; overflow-y: auto; font-size: 0.65rem; color: var(--text-muted); background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; border: 1px solid var(--accent); margin-top: 5px; }
+        .mem-entry { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 6px 0; display: flex; justify-content: space-between; }
+        .icon-btn { width: 18px; height: 18px; fill: var(--text-muted); cursor: pointer; transition: 0.2s; }
+        .icon-btn:hover { fill: var(--accent); }
 
         /* Settings Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--panel-bg); padding: 25px; border-radius: 20px; width: 340px; border: 1px solid var(--panel-border); }
-        label { font-size: 0.7rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 10px; background: #000; border: 1px solid var(--panel-border); color: #fff; border-radius: 8px; margin-bottom: 15px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .modal-content { background: var(--glass-bg); padding: 30px; border-radius: 16px; width: 360px; border: 1px solid var(--glass-border); }
+        label { font-size: 0.65rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 5px; letter-spacing: 1px; }
+        input, select { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: #fff; border-radius: 6px; margin-bottom: 18px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
 <div id="settings-modal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0">System Settings</h3>
+        <h3 style="margin-top:0; font-size: 0.9rem; color: var(--accent); letter-spacing: 2px;">CORE CONFIGURATION</h3>
         
-        <label>PLAYER NAME</label>
-        <input type="text" id="name-in" placeholder="Enter name...">
+        <label>DESIGNATION</label>
+        <input type="text" id="name-in">
         
-        <label>BOARD COLOR (DARK SQUARES)</label>
+        <label>LM STUDIO UPLINK PORT</label>
+        <input type="text" id="port-in" placeholder="1234">
+
+        <label>INTERFACE ACCENT (BOARD)</label>
         <input type="color" id="color-in">
         
-        <label>PIECE DESIGN (WIKIPEDIA SETS)</label>
+        <label>PIECE ARCHETYPE</label>
         <select id="style-in">
-            <option value="wiki">Wikipedia Classic</option>
-            <option value="cburnett">Wikipedia (cburnett)</option>
-            <option value="merida">Wikipedia (Merida)</option>
-            <option value="alpha">Wikipedia (Alpha)</option>
+            <option value="wiki">Classic Archive</option>
+            <option value="cburnett">Wikipedia Standard</option>
+            <option value="merida">Merida Variant</option>
+            <option value="alpha">Alpha Digital</option>
         </select>
         
-        <button onclick="saveSettings()">APPLY CONFIGURATION</button>
-        <button class="btn-sec" onclick="toggleModal('settings-modal')">CLOSE</button>
+        <button onclick="saveSettings()">COMMIT TO MEMORY</button>
+        <button class="btn-sec" onclick="toggleModal('settings-modal')">ABORT</button>
     </div>
 </div>
 
 <div class="app-container">
     <div class="sidebar">
         <div class="panel">
+            <div style="display:flex; justify-content: space-between; margin-bottom: 12px;">
+                <svg class="icon-btn" viewBox="0 0 24 24" onclick="toggleTheme()">
+                    <path d="M12 21A9 9 0 1 1 21 12A9 9 0 0 1 12 21Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 21A9 9 0 0 1 12 3V21Z" fill="currentColor"/>
+                </svg>
+                <svg class="icon-btn" viewBox="0 0 24 24" onclick="toggleModal('settings-modal')">
+                    <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.91,7.62,6.29L5.23,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.72,8.87 c-0.11,0.2-0.06,0.47,0.12,0.61l2.03,1.58C4.84,11.36,4.82,11.68,4.82,12c0,0.32,0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.11-0.2,0.06-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 c0-1.98,1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6C15.6,13.98,13.98,15.6,12,15.6z"/>
+                </svg>
+            </div>
             <div class="bot-frame"><div class="bot-screen" id="ai-face">
-                <svg width="60" height="30" viewBox="0 0 100 40">
-                    <path id="l-eye" class="eye" d="M30 20 L40 20" />
-                    <path id="r-eye" class="eye" d="M60 20 L70 20" />
+                <svg width="80" height="50" viewBox="0 0 100 60">
+                    <path id="l-eye" class="eye" d="M30 25 L40 25" />
+                    <path id="r-eye" class="eye" d="M60 25 L70 25" />
+                    <path id="mouth" class="mouth-path" d="M40 45 Q50 52 60 45" />
                 </svg>
             </div></div>
-            <div id="ai-msg" class="chat-bubble">Stratagem-0 initialized.</div>
+            <div id="ai-msg" class="chat-bubble">Stratagem-0 Online. Neural link established.</div>
         </div>
         <div class="panel">
-            <div style="font-weight:800; color:var(--accent); font-size:0.6rem; margin-bottom:5px;">BRAIN INSPECTOR</div>
-            <div id="memory-list" class="memory-box"></div>
+            <div style="font-weight: 800; color: var(--accent); font-size: 0.6rem; letter-spacing: 1px;">MEMORY INSPECTOR</div>
+            <div id="memory-list" class="memory-box">Scanning...</div>
         </div>
-        <button onclick="startSelfTrain()">⚡ SELF-TRAIN (100x)</button>
+        <button onclick="startSelfTrain()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z"/></svg>
+            SELF-CALIBRATE
+        </button>
     </div>
 
     <div class="board-column">
-        <div class="panel" style="width:100%; display:flex; justify-content:space-between; padding:8px 15px; align-items:center;">
-            <div style="font-weight: 800; font-size: 0.9rem;">Stratagem-0 <span style="font-size:0.6rem; opacity:0.5;">v1.0 Beta</span></div>
-            <div style="display:flex; gap:10px;">
-                <span id="train-label" style="font-size: 0.6rem; color: var(--accent);"></span>
-                <span onclick="toggleModal('settings-modal')" style="cursor:pointer">⚙️</span>
-            </div>
+        <div class="panel" style="width:100%; display:flex; justify-content:space-between; padding:10px 20px; align-items:center;">
+            <div style="font-weight: 800; font-size: 0.75rem; letter-spacing: 2px;">STRATAGEM-0 <span style="opacity:0.4;">1.3.B</span></div>
+            <span id="train-label" style="font-size: 0.6rem; color: var(--accent); font-weight: 800;"></span>
         </div>
         <div class="board-wrapper"><div id="board"></div></div>
-        <div class="panel" style="width:100%; padding:8px 15px; opacity:0.6"><b id="user-display">Player One</b></div>
+        <div class="panel" style="width:100%; padding:10px 20px; opacity:0.6; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;"><span id="user-display">USER_PROTOCOL</span></div>
     </div>
 
     <div class="sidebar">
         <div class="panel" style="flex-grow:1">
-            <div style="font-weight:800; font-size:0.6rem; margin-bottom:5px;">MOVE LOG</div>
-            <div id="log" style="height:140px; overflow-y:auto; font-size:0.7rem;"></div>
+            <div style="font-weight:800; font-size:0.6rem; color: var(--text-muted); margin-bottom:8px; letter-spacing:1px;">TACTICAL LOG</div>
+            <div id="log" style="height:170px; overflow-y:auto; font-size:0.7rem; color: var(--accent);"></div>
         </div>
-        <button class="btn-sec" onclick="saveBrainFile()">💾 SAVE BRAIN</button>
-        <button class="btn-sec" onclick="loadBrainFile()">📂 LOAD BRAIN</button>
-        <button onclick="location.reload()" style="background:#222; margin-top:10px;">REBOOT</button>
+        <button class="btn-sec" onclick="saveBrainFile()">SAVE PERSISTENCE</button>
+        <button class="btn-sec" onclick="loadBrainFile()">LOAD PERSISTENCE</button>
+        <button onclick="location.reload()" style="background:#111; color:#fff; margin-top:10px; border:1px solid #333;">SYSTEM REBOOT</button>
     </div>
 </div>
 
 <script>
 /* 
    ==========================================================================
-   THE ENGINE: STRATAGEM-0 v1.0
+   ENGINE: STRATAGEM-0 PRO (v1.3)
    ==========================================================================
 */
-class StratagemEngine {
+class StratagemAI {
     constructor() {
         this.board = this.init();
         this.turn = 'w';
@@ -178,8 +253,7 @@ class StratagemEngine {
     evaluate(board) {
         let score = 0;
         const hash = this.getHash(board);
-        if (this.brain[hash]) score += (this.brain[hash] * 10); // Boosted learning weight
-
+        if (this.brain[hash]) score += (this.brain[hash] * 10);
         for (let r=0; r<8; r++) for (let c=0; c<8; c++) {
             const p = board[r][c];
             if (p) score += (p.color === 'w' ? this.weights[p.type] : -this.weights[p.type]);
@@ -187,63 +261,32 @@ class StratagemEngine {
         return score;
     }
 
-    minimax(board, depth, alpha, beta, isMax) {
-        if (depth === 0) return -this.evaluate(board);
-        const color = isMax ? 'b' : 'w';
-        let moves = [];
-        for (let r=0; r<8; r++) for (let c=0; c<8; c++) 
-            if (board[r][c]?.color === color) 
-                this.getLegalMoves(r, c, board).forEach(m => moves.push({fr:r, fc:c, tr:m[0], tc:m[1]}));
-
-        if (isMax) {
-            let v = -Infinity;
-            for (const m of moves) {
-                const nb = this.clone(board);
-                nb[m.tr][m.tc] = nb[m.fr][m.fc]; nb[m.fr][m.fc] = null;
-                v = Math.max(v, this.minimax(nb, depth-1, alpha, beta, false));
-                alpha = Math.max(alpha, v); if (beta <= alpha) break;
-            }
-            return v;
-        } else {
-            let v = Infinity;
-            for (const m of moves) {
-                const nb = this.clone(board);
-                nb[m.tr][m.tc] = nb[m.fr][m.fc]; nb[m.fr][m.fc] = null;
-                v = Math.min(v, this.minimax(nb, depth-1, alpha, beta, true));
-                beta = Math.min(beta, v); if (beta <= alpha) break;
-            }
-            return v;
-        }
-    }
-
     getBestMove() {
-        let best = null, bVal = -Infinity;
+        let best = null, bestV = -Infinity;
         let moves = [];
         for (let r=0; r<8; r++) for (let c=0; c<8; c++) 
             if (this.board[r][c]?.color === 'b') 
-                this.getLegalMoves(r, c).forEach(m => moves.push({fr:r, fc:c, tr:m[0], tc:m[1]}));
+                this.getLegalMoves(r, c, this.board).forEach(m => moves.push({fr:r, fc:c, tr:m[0], tc:m[1]}));
 
         for (const m of moves) {
-            const nb = this.clone(this.board);
+            const nb = this.board.map(row => [...row]);
             nb[m.tr][m.tc] = nb[m.fr][m.fc]; nb[m.fr][m.fc] = null;
-            const val = this.minimax(nb, 2, -Infinity, Infinity, false);
-            if (val > bVal) { bVal = val; best = m; }
+            const v = -this.evaluate(nb); 
+            if (v > bestV) { bestV = v; best = m; }
         }
         return best;
     }
-
-    clone(b) { return b.map(r => r.map(p => p ? {...p} : null)); }
 }
 
 /* 
    ==========================================================================
-   UI & SYSTEM CONTROL
+   UI & APP CONTROL
    ==========================================================================
 */
-const engine = new StratagemEngine();
+const engine = new StratagemAI();
 const boardEl = document.getElementById('board');
 let selected = null;
-let stats = JSON.parse(localStorage.getItem('stratagem_v1_stats')) || { name: 'Player One', color: '#b84b3e', style: 'cburnett' };
+let stats = JSON.parse(localStorage.getItem('stratagem_v13_stats')) || { name: 'OPERATOR_01', port: '1234', color: '#b84b3e', style: 'cburnett', theme: 'dark' };
 
 function render() {
     if (!boardEl.children.length) {
@@ -266,7 +309,7 @@ function render() {
         } else if (img) s.innerHTML = '';
     }
     updateBrainUI();
-    document.getElementById('log').innerHTML = engine.history.map((m, i) => `<div>${i+1}. ${m}</div>`).join('');
+    document.getElementById('log').innerHTML = engine.history.map((m, i) => `<div>[STEP_${(i+1).toString().padStart(2,'0')}] ${m}</div>`).join('');
 }
 
 function getPiecePath(color, type) {
@@ -289,53 +332,87 @@ function handle(r, c) {
             piece.moved = true;
             engine.history.push(`${piece.type.toUpperCase()}${String.fromCharCode(97+c)}${8-r}`);
             engine.turn = 'b'; selected = null; render();
-            setTimeout(processAI, 500);
+            processAI();
         }
     }
 }
 
-function processAI() {
-    const m = engine.getBestMove();
-    if (m) {
-        const p = engine.board[m.fr][m.fc];
-        engine.board[m.tr][m.tc] = p; engine.board[m.fr][m.fc] = null;
-        p.moved = true;
-        engine.history.push(`${p.type.toUpperCase()}${String.fromCharCode(97+m.tc)}${8-m.tr}`);
-        const hash = engine.getHash(engine.board);
-        engine.brain[hash] = (engine.brain[hash] || 0) + 1; // Basic learning
-        engine.turn = 'w'; render();
+async function processAI() {
+    const moods = ['thinking', 'skeptical', 'surprised', 'happy'];
+    setMood(moods[Math.floor(Math.random()*moods.length)]);
+    
+    try {
+        const res = await fetch(`http://localhost:${stats.port}/v1/chat/completions`, {
+            method: "POST", headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ messages: [{role: "system", content: "Tactical response to: " + engine.history.slice(-1)}], max_tokens: 30 })
+        });
+        const d = await res.json();
+        document.getElementById('ai-msg').innerText = d.choices[0].message.content;
+    } catch(e) { document.getElementById('ai-msg').innerText = "Analyzing move... Calculating optimal counter-strategy."; }
+
+    setTimeout(() => {
+        const m = engine.getBestMove();
+        if (m) {
+            const p = engine.board[m.fr][m.fc];
+            engine.board[m.tr][m.tc] = p; engine.board[m.fr][m.fc] = null;
+            p.moved = true;
+            engine.history.push(`${p.type.toUpperCase()}${String.fromCharCode(97+m.tc)}${8-m.tr}`);
+            engine.brain[engine.getHash(engine.board)] = (engine.brain[engine.getHash(engine.board)] || 0) + 1;
+            engine.turn = 'w'; setMood('idle'); render();
+        }
+    }, 800);
+}
+
+function setMood(m) {
+    const s = document.getElementById('ai-face'); s.className = 'bot-screen mood-' + m;
+    const l = document.getElementById('l-eye'), r = document.getElementById('r-eye'), mouth = document.getElementById('mouth');
+    
+    // Reset
+    l.setAttribute('d', "M30 25 L40 25"); r.setAttribute('d', "M60 25 L70 25");
+    mouth.setAttribute('d', "M40 45 Q50 52 60 45");
+
+    if (m==='skeptical') { 
+        l.setAttribute('d',"M30 27 L40 25"); r.setAttribute('d',"M60 25 L70 27"); 
+        mouth.setAttribute('d', "M40 48 L60 48");
+    }
+    else if (m==='happy') { 
+        l.setAttribute('d',"M30 25 Q35 20 40 25"); r.setAttribute('d',"M60 25 Q65 20 70 25"); 
+        mouth.setAttribute('d', "M35 45 Q50 58 65 45");
+    }
+    else if (m==='surprised') { 
+        l.setAttribute('d',"M32 23 A 4 4 0 1 1 38 23"); r.setAttribute('d',"M62 23 A 4 4 0 1 1 68 23"); 
+        mouth.setAttribute('d', "M45 50 A 5 5 0 1 1 55 50");
     }
 }
 
 function updateBrainUI() {
     const list = document.getElementById('memory-list');
     const sorted = Object.keys(engine.brain).sort((a,b) => engine.brain[b] - engine.brain[a]).slice(0, 8);
-    list.innerHTML = sorted.map(k => `<div class="mem-entry"><span>${k.substring(0,8)}...</span><b>${engine.brain[k]}</b></div>`).join('');
+    list.innerHTML = sorted.map(k => `<div class="mem-entry"><span>DATA_${k.substring(0,6)}</span><b>+${engine.brain[k]}</b></div>`).join('');
 }
 
 async function startSelfTrain() {
     document.getElementById('train-label').innerText = "CALIBRATING...";
-    for (let i = 0; i < 50; i++) {
-        let sim = new StratagemEngine();
-        sim.brain = engine.brain;
-        let moves = 0;
-        while (moves < 30) {
+    setMood('thinking');
+    for (let i = 0; i < 30; i++) {
+        let sim = new StratagemAI(); sim.brain = engine.brain;
+        let mvCount = 0;
+        while (mvCount < 25) {
             const m = sim.getBestMove(); if(!m) break;
             sim.board[m.tr][m.tc] = sim.board[m.fr][m.fc]; sim.board[m.fr][m.fc] = null;
-            const hash = sim.getHash(sim.board);
-            engine.brain[hash] = (engine.brain[hash] || 0) + 1;
-            moves++;
+            engine.brain[sim.getHash(sim.board)] = (engine.brain[sim.getHash(sim.board)] || 0) + 1;
+            mvCount++;
         }
         if (i % 5 === 0) await new Promise(r => setTimeout(r, 5));
     }
     document.getElementById('train-label').innerText = "DONE";
-    render();
+    setMood('happy'); setTimeout(()=>setMood('idle'), 2000); render();
 }
 
 async function saveBrainFile() {
     const blob = new Blob([JSON.stringify(engine.brain)], {type: 'application/json'});
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = 'Stratagem_Brain.json'; a.click();
+    a.download = 'Stratagem_V13_Soul.json'; a.click();
 }
 
 function loadBrainFile() {
@@ -349,17 +426,20 @@ function loadBrainFile() {
 }
 
 function toggleModal(id) { const m = document.getElementById(id); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; }
+function toggleTheme() { stats.theme = stats.theme === 'dark' ? 'light' : 'dark'; localStorage.setItem('stratagem_v13_stats', JSON.stringify(stats)); location.reload(); }
 
 function saveSettings() {
     stats.name = document.getElementById('name-in').value || stats.name;
+    stats.port = document.getElementById('port-in').value || stats.port;
     stats.color = document.getElementById('color-in').value;
     stats.style = document.getElementById('style-in').value;
-    localStorage.setItem('stratagem_v1_stats', JSON.stringify(stats));
+    localStorage.setItem('stratagem_v13_stats', JSON.stringify(stats));
     location.reload();
 }
 
-// Init Visuals
+// Initial Sync
 document.getElementById('name-in').value = stats.name;
+document.getElementById('port-in').value = stats.port;
 document.getElementById('color-in').value = stats.color;
 document.getElementById('style-in').value = stats.style;
 document.getElementById('user-display').innerText = stats.name;
